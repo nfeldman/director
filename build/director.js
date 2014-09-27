@@ -1,8 +1,8 @@
 
 
 //
-// Generated on Wed Jun 25 2014 00:16:13 GMT-0700 (PDT) by Nodejitsu, Inc (Using Codesurgeon).
-// Version 1.2.4
+// Generated on Fri Sep 26 2014 20:19:31 GMT-0400 (EDT) by Nodejitsu, Inc (Using Codesurgeon).
+// Version 1.2.5
 //
 
 (function (exports) {
@@ -17,19 +17,26 @@
 
 var dloc = document.location;
 
+function getHash() {
+  var hash = dloc.href.split("#")[1] || '';
+  if (hash !== '') { hash = '#' + hash }
+  return hash;
+}
+
 function dlocHashEmpty() {
   // Non-IE browsers return '' when the address bar shows '#'; Director's logic
   // assumes both mean empty.
-  return dloc.hash === '' || dloc.hash === '#';
+  var hash = getHash();
+  return hash === '' || hash === '#';
 }
 
 var listener = {
   mode: 'modern',
-  hash: dloc.hash,
+  hash: getHash(),
   history: false,
 
   check: function () {
-    var h = dloc.hash;
+    var h = getHash();
     if (h != this.hash) {
       this.hash = h;
       this.onHashChanged();
@@ -150,7 +157,7 @@ var listener = {
   syncHash: function () {
     // IE support...
     var s = this._hash;
-    if (s != dloc.hash) {
+    if (s != getHash()) {
       dloc.hash = s;
     }
     return this;
@@ -191,11 +198,11 @@ Router.prototype.init = function (r) {
     if (dlocHashEmpty() && r) {
       dloc.hash = r;
     } else if (!dlocHashEmpty()) {
-      self.dispatch('on', '/' + dloc.hash.replace(/^(#\/|#|\/)/, ''));
+      self.dispatch('on', '/' + getHash().replace(/^(#\/|#|\/)/, ''));
     }
   }
   else {
-    var routeTo = dlocHashEmpty() && r ? r : !dlocHashEmpty() ? dloc.hash.replace(/^#/, '') : null;
+    var routeTo = dlocHashEmpty() && r ? r : !dlocHashEmpty() ? getHash().replace(/^#/, '') : null;
     if (routeTo) {
       window.history.replaceState({}, document.title, routeTo);
     }
@@ -211,7 +218,7 @@ Router.prototype.init = function (r) {
 };
 
 Router.prototype.explode = function () {
-  var v = this.history === true ? this.getPath() : dloc.hash;
+  var v = this.history === true ? this.getPath() : getHash();
   if (v.charAt(1) === '/') { v=v.slice(1) }
   return v.slice(1, v.length).split("/");
 };
